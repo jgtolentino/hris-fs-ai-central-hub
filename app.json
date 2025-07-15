@@ -15,14 +15,20 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.rork.tbwa-hris-ai-central-hub"
+      "bundleIdentifier": "app.rork.tbwa-hris-ai-central-hub",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs access to camera to capture receipts and selfies for attendance.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to photo library to select receipts and documents.",
+        "NSLocationWhenInUseUsageDescription": "This app needs access to location for attendance tracking."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.tbwa-hris-ai-central-hub"
+      "package": "app.rork.tbwa-hris-ai-central-hub",
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -33,7 +39,12 @@
         {
           "origin": "https://rork.com/"
         }
-      ]
+      ],
+      "expo-camera",
+      "expo-image-picker",
+      "expo-secure-store",
+      "expo-location",
+      "expo-document-picker"
     ],
     "experiments": {
       "typedRoutes": true
