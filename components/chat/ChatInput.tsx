@@ -11,7 +11,7 @@ interface ChatInputProps {
   placeholder?: string;
 }
 
-export default function ChatInput({ 
+export function ChatInput({ 
   value, 
   onChangeText, 
   onSend, 
@@ -101,3 +101,5 @@ const styles = StyleSheet.create({
     backgroundColor: DesignTokens.colors.border,
   },
 });
+
+export default ChatInput;

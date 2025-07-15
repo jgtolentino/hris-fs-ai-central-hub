@@ -7,7 +7,7 @@ interface ChatHeaderProps {
   onClearChat: () => void;
 }
 
-export default function ChatHeader({ onClearChat }: ChatHeaderProps) {
+export function ChatHeader({ onClearChat }: ChatHeaderProps) {
   return (
     <View style={styles.container}>
       <View style={styles.titleSection}>
@@ -62,3 +62,5 @@ const styles = StyleSheet.create({
     padding: DesignTokens.spacing.sm,
   },
 });
+
+export default ChatHeader;

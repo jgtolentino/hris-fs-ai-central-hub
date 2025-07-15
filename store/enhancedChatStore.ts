@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { Message, ChatState, WorkflowAction } from "@/types/chat";
 
 interface EnhancedChatStore extends ChatState {
-  sendMessage: (content: string) => Promise<{ workflowAction?: WorkflowAction | null; suggestions?: string[] }>;
+  sendMessage: (content: string) => Promise<{ workflowAction?: WorkflowAction | undefined; suggestions?: string[] | undefined; }>;
   processWorkflowRequest: (intent: string, parameters: any) => Promise<any>;
   clearChat: () => void;
   fetchSuggestedQuestions: () => Promise<void>;
@@ -67,7 +67,7 @@ export const useEnhancedChatStore = create<EnhancedChatStore>((set, get) => ({
       });
 
       return {
-        workflowAction: response.workflowAction || null,
+        workflowAction: response.workflowAction,
         suggestions: response.suggestions
       };
     } catch (error) {

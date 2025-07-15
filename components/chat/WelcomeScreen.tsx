@@ -11,7 +11,7 @@ interface WelcomeScreenProps {
   suggestions: string[];
 }
 
-export default function WelcomeScreen({ 
+export function WelcomeScreen({ 
   onQuickAction, 
   onSuggestionPress, 
   suggestions 
@@ -77,3 +77,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: DesignTokens.spacing.lg,
   },
 });
+
+export default WelcomeScreen;

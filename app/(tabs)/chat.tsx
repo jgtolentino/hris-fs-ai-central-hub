@@ -3,11 +3,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { Stack, router } from "expo-router";
 import { DesignTokens } from "@/constants/designTokens";
 import { useEnhancedChatStore } from "@/store/enhancedChatStore";
-import ChatHeader from "@/components/chat/ChatHeader";
+import { ChatHeader } from "@/components/chat/ChatHeader";
 import MessageBubble from "@/components/chat/MessageBubble";
-import ChatInput from "@/components/chat/ChatInput";
+import { ChatInput } from "@/components/chat/ChatInput";
 import TypingIndicator from "@/components/chat/TypingIndicator";
-import WelcomeScreen from "@/components/chat/WelcomeScreen";
+import { WelcomeScreen } from "@/components/chat/WelcomeScreen";
 import { Message } from "@/types/chat";
 
 export default function EnhancedChatScreen() {
