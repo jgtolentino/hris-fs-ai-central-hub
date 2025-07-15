@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Home, MessageSquare, Clock, FileText, MoreHorizontal, Sparkles } from "lucide-react-native";
+import { Home, MessageSquare, Clock, FileText, MoreHorizontal, Sparkles, Receipt, Ticket } from "lucide-react-native";
 import React from "react";
 import { Text, View } from "react-native";
 import { DesignTokens } from "@/constants/designTokens";
@@ -86,11 +86,21 @@ export default function TabLayout() {
       />
       
       <Tabs.Screen
-        name="requests"
+        name="expenses"
         options={{
-          title: "Requests",
+          title: "Expenses",
           tabBarIcon: ({ color, size, focused }) => (
-            <FileText color={focused ? DesignTokens.colors.requestModule : color} size={focused ? 26 : size} />
+            <Receipt color={focused ? DesignTokens.colors.primary : color} size={focused ? 26 : size} />
+          ),
+        }}
+      />
+      
+      <Tabs.Screen
+        name="tickets"
+        options={{
+          title: "Support",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ticket color={focused ? DesignTokens.colors.primary : color} size={focused ? 26 : size} />
           ),
         }}
       />
