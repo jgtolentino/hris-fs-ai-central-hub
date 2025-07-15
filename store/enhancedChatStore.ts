@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { Message, ChatState, WorkflowAction } from "@/types/chat";
 
 interface EnhancedChatStore extends ChatState {
-  sendMessage: (content: string) => Promise<{ workflowAction?: WorkflowAction | undefined; suggestions?: string[] | undefined; }>;
+  sendMessage: (content: string) => Promise<{ workflowAction?: WorkflowAction; suggestions?: string[]; }>;
   processWorkflowRequest: (intent: string, parameters: any) => Promise<any>;
   clearChat: () => void;
   fetchSuggestedQuestions: () => Promise<void>;
@@ -67,8 +67,8 @@ export const useEnhancedChatStore = create<EnhancedChatStore>((set, get) => ({
       });
 
       return {
-        workflowAction: response.workflowAction,
-        suggestions: response.suggestions
+        workflowAction: response.workflowAction || undefined,
+        suggestions: response.suggestions || []
       };
     } catch (error) {
       console.error('Send message error:', error);
@@ -217,7 +217,7 @@ async function processMessageWithAI(message: string) {
 }
 
 function getWorkflowHelpContent(workflowType: string): string {
-  const helpContent: { [key: string]: string } = {
+  const helpContent: Record<string, string> = {
     leave_request: "To submit a leave request:\n\n1. Choose your leave type (vacation, sick, personal)\n2. Select your dates\n3. Provide a reason\n4. Upload medical certificate if required\n5. Submit for approval\n\nApproval typically takes 1-2 business days.",
     expense_submission: "To submit an expense:\n\n1. Take a photo of your receipt\n2. Fill in the expense details\n3. Select the appropriate category\n4. Add business purpose\n5. Submit for approval\n\nReceipts are processed with OCR for accuracy.",
     time_correction: "To correct your time entry:\n\n1. Select the date to correct\n2. Specify the correct clock in/out time\n3. Explain the reason for correction\n4. Submit for approval\n\nTime corrections are usually approved within 24 hours.",
