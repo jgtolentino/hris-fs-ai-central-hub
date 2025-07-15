@@ -67,7 +67,7 @@ export const useEnhancedChatStore = create<EnhancedChatStore>((set, get) => ({
       });
 
       return {
-        workflowAction: response.workflowAction || undefined,
+        workflowAction: response.workflowAction ?? undefined,
         suggestions: response.suggestions || []
       };
     } catch (error) {
@@ -224,5 +224,5 @@ function getWorkflowHelpContent(workflowType: string): string {
     it_request: "To submit an IT request:\n\n1. Choose request type (hardware, software, access)\n2. Describe your requirements\n3. Set priority level\n4. Submit for processing\n\nIT requests are handled based on priority and availability."
   };
 
-  return helpContent[workflowType] || "I can provide help with various workflows. What specific process do you need help with?";
+  return helpContent[workflowType as keyof typeof helpContent] || "I can provide help with various workflows. What specific process do you need help with?";
 }

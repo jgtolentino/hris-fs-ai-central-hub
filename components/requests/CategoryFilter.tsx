@@ -10,13 +10,13 @@ interface CategoryFilterProps {
   onCategorySelect: (categoryCode: string | null) => void;
 }
 
-const categoryIcons: Record<string, any> = {
+const categoryIcons = {
   hr: User,
   finance: CreditCard,
   it: Laptop,
   admin: Building,
   compliance: Shield,
-};
+} as const;
 
 export default function CategoryFilter({ 
   categories, 
@@ -48,7 +48,7 @@ export default function CategoryFilter({
           </TouchableOpacity>
           
           {categories.map((category) => {
-            const IconComponent = categoryIcons[category.code] || User;
+            const IconComponent = categoryIcons[category.code as keyof typeof categoryIcons] || User;
             const isSelected = selectedCategory === category.code;
             
             return (

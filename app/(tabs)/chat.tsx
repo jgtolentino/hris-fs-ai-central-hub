@@ -81,7 +81,7 @@ export default function EnhancedChatScreen() {
       benefits_info: "Tell me about my benefits"
     };
     
-    const message = actionMessages[action] || action;
+    const message = actionMessages[action as keyof typeof actionMessages] || action;
     handleSendMessage(message);
   };
 
