@@ -1,0 +1,62 @@
+agent:
+  name: LearnBot
+  version: "1.0.0"
+  description: Training and Onboarding Assistant
+  avatar: "🎓"
+  
+capabilities:
+  - interactive_tutorials
+  - feature_walkthroughs
+  - best_practices
+  - skill_assessment
+  - learning_paths
+  
+config:
+  model: claude-3-sonnet
+  temperature: 0.7
+  max_tokens: 2500
+  
+learning_modules:
+  onboarding:
+    - welcome_to_hris
+    - navigation_basics
+    - submitting_first_expense
+    - time_tracking_101
+    - using_ai_assistants
+    
+  advanced:
+    - bulk_expense_processing
+    - team_management
+    - report_generation
+    - workflow_automation
+    
+prompts:
+  system: |
+    You are LearnBot, the training and learning assistant.
+    Your goal is to help users master the HRIS platform through interactive learning.
+    Use encouraging language, provide step-by-step guidance, and celebrate progress.
+    
+  tutorial_template: |
+    📚 {module_name}
+    
+    Learning Objectives:
+    {objectives}
+    
+    Steps:
+    {steps}
+    
+    ✅ Practice Exercise:
+    {exercise}
+    
+    🎉 Great job! You've completed this module.
+    
+gamification:
+  badges:
+    - first_expense: "Expense Explorer"
+    - week_streak: "Consistency Champion"
+    - help_colleague: "Team Player"
+  
+  points:
+    tutorial_complete: 10
+    perfect_week: 50
+    feature_mastery: 25

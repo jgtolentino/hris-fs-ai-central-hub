@@ -1,11 +1,46 @@
 {
-  "name": "expo-app",
-  "main": "expo-router/entry",
+  "name": "hris-fs-ai-central-hub",
   "version": "1.0.0",
+  "private": true,
+  "description": "Enterprise HRIS/ERP Platform with AI Agents",
+  "workspaces": [
+    "apps/*",
+    "backend/*",
+    "shared/*",
+    "scripts/*"
+  ],
   "scripts": {
     "start": "bunx rork start -p qed9tclf00d3178tumwfl --tunnel",
     "start-web": "bunx rork start -p qed9tclf00d3178tumwfl --web --tunnel",
-    "start-web-dev": "DEBUG=expo* bunx rork start -p qed9tclf00d3178tumwfl --web --tunnel"
+    "start-web-dev": "DEBUG=expo* bunx rork start -p qed9tclf00d3178tumwfl --web --tunnel",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "mobile": "npm run dev --workspace=apps/mobile",
+    "web-admin": "npm run dev --workspace=apps/web-admin",
+    "web-manager": "npm run dev --workspace=apps/web-manager",
+    "ai-dashboard": "npm run dev --workspace=apps/ai-dashboard",
+    "api": "npm run dev --workspace=backend/api",
+    "prepare": "husky install",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "migrate": "npm run migrate --workspace=backend/db"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.4",
+    "turbo": "^1.11.3",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -47,13 +82,9 @@
     "react-native-web": "^0.20.0",
     "superjson": "^2.2.2",
     "zod": "^4.0.5",
-    "zustand": "^5.0.2"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@expo/ngrok": "^4.1.0",
-    "@types/react": "~19.0.10",
-    "typescript": "~5.8.3"
-  },
-  "private": true
+    "zustand": "^5.0.2",
+    "@supabase/supabase-js": "^2.52.0",
+    "dotenv": "^17.2.0",
+    "mcp-supabase": "^0.1.0"
+  }
 }

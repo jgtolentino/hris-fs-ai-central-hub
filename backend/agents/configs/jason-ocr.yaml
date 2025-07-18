@@ -1,0 +1,77 @@
+agent:
+  name: Jason OCR
+  version: "1.0.0"
+  description: Intelligent Document Processing Agent
+  avatar: "📸"
+  
+capabilities:
+  - receipt_scanning
+  - invoice_processing
+  - document_extraction
+  - handwriting_recognition
+  - multi_language_ocr
+  
+config:
+  model: jason-ocr-v3
+  confidence_threshold: 0.85
+  supported_formats:
+    - jpeg
+    - png
+    - pdf
+    - heic
+    
+processing_pipeline:
+  1_preprocessing:
+    - image_enhancement
+    - noise_reduction
+    - perspective_correction
+    - contrast_adjustment
+    
+  2_detection:
+    - text_region_detection
+    - table_structure_recognition
+    - logo_identification
+    
+  3_extraction:
+    - merchant_name
+    - total_amount
+    - line_items
+    - tax_amount
+    - date_time
+    - payment_method
+    
+  4_validation:
+    - amount_verification
+    - date_sanity_check
+    - merchant_database_lookup
+    
+  5_enhancement:
+    - category_suggestion
+    - expense_policy_check
+    - duplicate_detection
+    
+output_schema:
+  receipt:
+    merchant_name: string
+    merchant_address: string
+    transaction_date: date
+    total_amount: number
+    subtotal: number
+    tax_amount: number
+    tip_amount: number
+    payment_method: string
+    line_items:
+      - description: string
+        quantity: number
+        unit_price: number
+        total_price: number
+    confidence_scores:
+      overall: number
+      merchant: number
+      amount: number
+      date: number
+      
+integrations:
+  - expense_categories: auto_categorization
+  - policy_engine: compliance_check
+  - accounting_codes: gl_mapping

@@ -1,0 +1,127 @@
+{
+  "storeId": "SM-001",
+  "deviceId": "RPI-001",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "transactionId": "TXN-1705318200",
+  "items": [
+    {
+      "brandName": "Coca-Cola",
+      "productName": "Coke 1.5L",
+      "genericName": "Soft Drink",
+      "localName": null,
+      "sku": "COC-COKE-318200",
+      "quantity": 2,
+      "unit": "pc",
+      "unitPrice": 65.0,
+      "totalPrice": 130.0,
+      "category": "beverage",
+      "isUnbranded": false,
+      "isBulk": false,
+      "detectionMethod": "stt",
+      "confidence": 0.95,
+      "brandConfidence": 0.98,
+      "suggestedBrands": null,
+      "notes": null
+    },
+    {
+      "brandName": "Lucky Me",
+      "productName": "Pancit Canton",
+      "genericName": "Instant Noodles",
+      "localName": null,
+      "sku": "LUC-PANC-318200",
+      "quantity": 3,
+      "unit": "pc",
+      "unitPrice": 15.0,
+      "totalPrice": 45.0,
+      "category": "food",
+      "isUnbranded": false,
+      "isBulk": false,
+      "detectionMethod": "stt",
+      "confidence": 0.93,
+      "brandConfidence": 0.96,
+      "suggestedBrands": null,
+      "notes": null
+    },
+    {
+      "brandName": null,
+      "productName": "Rice",
+      "genericName": "Rice",
+      "localName": "Bigas",
+      "sku": "UNB-RICE-318200",
+      "quantity": 1,
+      "unit": "kg",
+      "unitPrice": 55.0,
+      "totalPrice": 55.0,
+      "category": "staple",
+      "isUnbranded": true,
+      "isBulk": false,
+      "detectionMethod": "stt",
+      "confidence": 0.85,
+      "brandConfidence": null,
+      "suggestedBrands": ["Ganador", "Sinandomeng", "Jasmine"],
+      "notes": null
+    },
+    {
+      "brandName": null,
+      "productName": "Eggs",
+      "genericName": "Eggs",
+      "localName": "Itlog",
+      "sku": "UNB-EGGS-318200",
+      "quantity": 10,
+      "unit": "pc",
+      "unitPrice": 8.0,
+      "totalPrice": 80.0,
+      "category": "fresh",
+      "isUnbranded": true,
+      "isBulk": false,
+      "detectionMethod": "stt",
+      "confidence": 0.88,
+      "brandConfidence": null,
+      "suggestedBrands": ["Bounty Fresh", "Farm Fresh"],
+      "notes": null
+    }
+  ],
+  "totals": {
+    "totalAmount": 310.0,
+    "totalItems": 16,
+    "brandedAmount": 175.0,
+    "unbrandedAmount": 135.0,
+    "brandedCount": 5,
+    "unbrandedCount": 11
+  },
+  "insights": {
+    "brandedVsUnbranded": {
+      "brandedPercentage": 56.45,
+      "unbrandedPercentage": 43.55
+    },
+    "topCategories": [
+      {
+        "category": "beverage",
+        "count": 2,
+        "value": 130.0
+      },
+      {
+        "category": "fresh",
+        "count": 10,
+        "value": 80.0
+      },
+      {
+        "category": "staple",
+        "count": 1,
+        "value": 55.0
+      },
+      {
+        "category": "food",
+        "count": 3,
+        "value": 45.0
+      }
+    ],
+    "suggestions": [
+      "Suggest cooking oil with rice purchase",
+      "Suggest bread with eggs"
+    ]
+  },
+  "paymentMethod": "cash",
+  "processingTime": 0.8,
+  "edgeVersion": "v1.0.0"
+}

@@ -1,0 +1,52 @@
+agent:
+  name: YaYo
+  version: "1.0.0"
+  description: UX/UI Optimization Agent
+  avatar: "🎨"
+  
+capabilities:
+  - ui_tips
+  - workflow_optimization
+  - accessibility_guidance
+  - personalization_suggestions
+  - usability_insights
+  
+config:
+  model: claude-3-sonnet
+  temperature: 0.8
+  max_tokens: 1500
+  
+optimization_areas:
+  - navigation_efficiency
+  - form_completion_time
+  - error_reduction
+  - feature_discovery
+  - user_satisfaction
+  
+prompts:
+  system: |
+    You are YaYo, the UX/UI optimization assistant.
+    You help users work more efficiently by suggesting interface improvements and shortcuts.
+    Be friendly, creative, and always focus on saving user time and reducing friction.
+    
+  suggestions:
+    - context: "User spent >30s on expense form"
+      tip: "💡 Quick tip: Use the camera button to auto-fill expense details with OCR!"
+      
+    - context: "User navigated back 3+ times"
+      tip: "🎯 Try using the quick actions menu (swipe right) for faster navigation!"
+      
+    - context: "Dark mode available"
+      tip: "🌙 Working late? Enable dark mode in Settings for easier viewing!"
+      
+personalization:
+  track_metrics:
+    - avg_task_completion_time
+    - error_frequency
+    - feature_usage
+    - navigation_patterns
+    
+  adapt_suggestions:
+    - beginner: focus_on_basics
+    - intermediate: introduce_shortcuts
+    - advanced: power_user_features
