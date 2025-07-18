@@ -1,14 +1,14 @@
 import { createTRPCReact } from '@trpc/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { QueryClient } from '@tanstack/react-query';
-import type { AppRouter } from '../../../backend/api/src/routers';
+import type { AppRouter } from '../../../backend/trpc/app-router';
 
 export const trpc = createTRPCReact<AppRouter>();
 
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000/trpc',
+      url: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000/api/trpc',
       headers: {
         'Content-Type': 'application/json',
       },
