@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Stack } from "expo-router";
 import { Camera, MapPin, Clock, Calendar } from "lucide-react-native";
 import { DesignTokens } from "@/constants/designTokens";
+import Colors from "@/constants/colors";
 import { useTimeStore } from "@/store/timeStore";
 import { useLocationStore } from "@/store/locationStore";
 import TimeCard from "@/components/time/TimeCard";

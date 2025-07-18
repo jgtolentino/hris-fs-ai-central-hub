@@ -38,6 +38,6 @@ export interface ChatResponse {
   sessionId: string;
   documentReferences?: DocumentReference[];
   confidenceScore?: number;
-  workflowAction?: WorkflowAction | null;
+  workflowAction?: WorkflowAction;
   suggestions?: string[];
 }

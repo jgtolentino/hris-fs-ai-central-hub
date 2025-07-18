@@ -67,7 +67,7 @@ export const useEnhancedChatStore = create<EnhancedChatStore>((set, get) => ({
       });
 
       return {
-        workflowAction: response.workflowAction ?? undefined,
+        workflowAction: response.workflowAction || undefined,
         suggestions: response.suggestions || []
       };
     } catch (error) {
