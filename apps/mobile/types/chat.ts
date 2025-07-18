@@ -30,3 +30,14 @@ export interface ChatState {
   referencedDocuments: DocumentReference[];
   sessionId: string | null;
 }
+
+export interface ChatResponse {
+  messageId: string;
+  content: string;
+  timestamp: string;
+  sessionId: string;
+  documentReferences?: DocumentReference[];
+  confidenceScore?: number;
+  workflowAction?: WorkflowAction | null;
+  suggestions?: string[];
+}
