@@ -47,10 +47,12 @@
     "@nkzw/create-context-hook": "^1.1.0",
     "@react-native-async-storage/async-storage": "2.1.2",
     "@react-navigation/native": "^7.1.6",
+    "@supabase/supabase-js": "^2.52.0",
     "@tanstack/react-query": "^5.83.0",
     "@trpc/client": "^11.4.3",
     "@trpc/react-query": "^11.4.3",
     "@trpc/server": "^11.4.3",
+    "dotenv": "^17.2.0",
     "expo": "^53.0.4",
     "expo-blur": "~14.1.4",
     "expo-camera": "~16.1.10",
@@ -70,6 +72,7 @@
     "expo-web-browser": "~14.1.6",
     "hono": "^4.8.5",
     "lucide-react-native": "^0.475.0",
+    "mcp-supabase": "^0.1.0",
     "nativewind": "^4.1.23",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -81,9 +84,6 @@
     "react-native-web": "^0.20.0",
     "superjson": "^2.2.2",
     "zod": "^4.0.5",
-    "zustand": "^5.0.2",
-    "@supabase/supabase-js": "^2.52.0",
-    "dotenv": "^17.2.0",
-    "mcp-supabase": "^0.1.0"
+    "zustand": "^5.0.2"
   }
 }

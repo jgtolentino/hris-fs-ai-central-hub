@@ -2,7 +2,7 @@ import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert } from "rea
 import React, { useState, useEffect } from "react";
 import { Stack } from "expo-router";
 import { Camera, MapPin, Clock, Calendar } from "lucide-react-native";
-import Colors from "@/constants/colors";
+import { DesignTokens } from "@/constants/designTokens";
 import { useTimeStore } from "@/store/timeStore";
 import { useLocationStore } from "@/store/locationStore";
 import TimeCard from "@/components/time/TimeCard";
@@ -77,8 +77,8 @@ export default function TimeScreen() {
       <Stack.Screen 
         options={{ 
           title: "Timekeeping",
-          headerStyle: { backgroundColor: Colors.light.background },
-          headerTintColor: Colors.light.text,
+          headerStyle: { backgroundColor: DesignTokens.colors.background },
+          headerTintColor: DesignTokens.colors.text,
         }} 
       />
       
@@ -109,11 +109,11 @@ export default function TimeScreen() {
             <Text style={styles.sectionTitle}>Quick Actions</Text>
             <View style={styles.actionButtons}>
               <TouchableOpacity style={styles.actionButton}>
-                <Calendar size={20} color={Colors.light.primary} />
+                <Calendar size={20} color={DesignTokens.colors.primary} />
                 <Text style={styles.actionText}>View Timesheet</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.actionButton}>
-                <Clock size={20} color={Colors.light.secondary} />
+                <Clock size={20} color={DesignTokens.colors.secondary} />
                 <Text style={styles.actionText}>Time Correction</Text>
               </TouchableOpacity>
             </View>
@@ -129,7 +129,7 @@ export default function TimeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+    backgroundColor: DesignTokens.colors.background,
   },
   content: {
     padding: 16,
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: Colors.light.text,
+    color: DesignTokens.colors.text,
     marginBottom: 12,
   },
   actionButtons: {
@@ -152,13 +152,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
-    backgroundColor: Colors.light.lightGray,
+    backgroundColor: DesignTokens.colors.surface,
     borderRadius: 12,
     gap: 8,
   },
   actionText: {
     fontSize: 14,
     fontWeight: "500",
-    color: Colors.light.text,
+    color: DesignTokens.colors.text,
   },
 });
