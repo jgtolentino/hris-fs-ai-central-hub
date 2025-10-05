@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "builds": [
+    {
+      "src": "apps/web-admin/package.json",
+      "use": "@vercel/next",
+      "config": {
+        "rootDirectory": "apps/web-admin"
+      }
+    }
+  ]
+}
