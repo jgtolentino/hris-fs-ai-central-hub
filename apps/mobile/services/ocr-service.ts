@@ -1,11 +1,14 @@
 // OCR Service for Receipt Processing
-// Integrates with Jason OCR API for expense receipt data extraction
+// Integrates with render-mcp-bridge FREE OCR service (OCR.space)
 
 import { createClient } from '@supabase/supabase-js';
-import ExifReader from 'exifreader';
 
-const JASON_OCR_API_URL = process.env.JASON_OCR_API_URL || 'https://api.jasonocr.com/v1';
-const JASON_OCR_API_KEY = process.env.JASON_OCR_API_KEY!;
+// Render MCP Bridge - FREE OCR endpoint (deployed on Vercel)
+const MCP_BRIDGE_URL = process.env.EXPO_PUBLIC_MCP_BRIDGE_URL ||
+  'https://render-mcp-bridge-919ww1du3-jake-tolentinos-projects-c0369c83.vercel.app';
+
+// Fallback: Direct OCR.space API (25,000 free requests/month)
+const OCRSPACE_API_KEY = process.env.EXPO_PUBLIC_OCRSPACE_API_KEY || 'K87899142388957';
 
 export interface OCRResult {
   merchantName: string | null;
@@ -45,7 +48,7 @@ export class OCRService {
   }
 
   /**
-   * Process receipt image with OCR
+   * Process receipt image with OCR using render-mcp-bridge (FREE)
    */
   async processReceipt(
     imageData: string | Buffer,
@@ -56,43 +59,41 @@ export class OCRService {
     } = {}
   ): Promise<OCRResult> {
     try {
-      // Prepare image for OCR
-      const base64Image = await this.prepareImage(imageData);
-      
-      // Extract EXIF data for additional metadata
-      const exifData = await this.extractExifData(imageData);
-      
-      // Call Jason OCR API
-      const ocrResponse = await fetch(`${JASON_OCR_API_URL}/receipts/extract`, {
+      // Upload image to Supabase storage first
+      const storagePath = await this.uploadToSupabase(imageData);
+
+      // Get current user ID
+      const { data: { user } } = await this.supabase.auth.getUser();
+      const userId = user?.id || 'anonymous';
+
+      // Call render-mcp-bridge FREE OCR endpoint
+      const ocrResponse = await fetch(`${MCP_BRIDGE_URL}/api/receipts/instant-ocr-free`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${JASON_OCR_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          image: base64Image,
-          enhance: options.enhanceImage ?? true,
-          extract_line_items: options.extractLineItems ?? true,
-          detect_currency: options.detectCurrency ?? true,
-          return_confidence: true,
-          language_hints: ['en', 'es', 'fr', 'de', 'ja', 'zh'],
+          storage_path: storagePath,
+          schema_name: 'receipt_v1',
+          user_id: userId,
         }),
       });
 
       if (!ocrResponse.ok) {
-        throw new Error(`OCR API error: ${ocrResponse.statusText}`);
+        // Fallback to direct OCR.space if MCP bridge fails
+        console.warn('MCP bridge OCR failed, falling back to OCR.space');
+        return await this.fallbackOCRSpace(imageData);
       }
 
       const ocrData = await ocrResponse.json();
-      
-      // Process and normalize OCR results
-      const result = this.normalizeOCRResult(ocrData, exifData);
-      
-      // Apply AI enhancement if confidence is low
-      if (result.confidence < 0.8) {
-        return await this.enhanceWithAI(result);
+
+      if (!ocrData.ok) {
+        throw new Error(ocrData.error || 'OCR processing failed');
       }
-      
+
+      // Convert MCP bridge response to our OCRResult format
+      const result = this.convertMCPBridgeResult(ocrData.data);
+
       return result;
     } catch (error) {
       console.error('OCR processing error:', error);
@@ -102,6 +103,175 @@ export class OCRService {
         details: error,
       } as OCRError;
     }
+  }
+
+  /**
+   * Upload image to Supabase storage
+   */
+  private async uploadToSupabase(imageData: string | Buffer): Promise<string> {
+    try {
+      // Convert to buffer if needed
+      let buffer: Buffer;
+
+      if (typeof imageData === 'string') {
+        if (imageData.startsWith('data:image')) {
+          // Base64 data URL
+          const base64 = imageData.split(',')[1];
+          buffer = Buffer.from(base64, 'base64');
+        } else if (imageData.startsWith('file://')) {
+          // Local file path - read file
+          const response = await fetch(imageData);
+          const blob = await response.blob();
+          const arrayBuffer = await blob.arrayBuffer();
+          buffer = Buffer.from(arrayBuffer);
+        } else {
+          // Assume it's already a base64 string
+          buffer = Buffer.from(imageData, 'base64');
+        }
+      } else {
+        buffer = imageData;
+      }
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const filename = `receipt-${timestamp}.jpg`;
+
+      // Upload to Supabase storage (receipts bucket)
+      const { data, error } = await this.supabase.storage
+        .from('receipts')
+        .upload(filename, buffer, {
+          contentType: 'image/jpeg',
+          upsert: false,
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      // Return storage path for MCP bridge
+      return `receipts/${filename}`;
+    } catch (error) {
+      console.error('Supabase upload error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Convert MCP bridge response to our OCRResult format
+   */
+  private convertMCPBridgeResult(data: any): OCRResult {
+    return {
+      merchantName: data.merchant || null,
+      amount: data.total || null,
+      currency: data.currency || 'USD',
+      date: data.date ? new Date(data.date) : null,
+      category: this.inferCategory(data.merchant),
+      taxAmount: data.tax || null,
+      paymentMethod: null,
+      confidence: (data.confidence || 0) / 100,
+      rawText: data.ocr_text || '',
+      metadata: {
+        ocrProvider: 'ocr.space',
+        ocrConfidence: data.ocr_confidence || 0.9,
+        processingTime: 0,
+        status: data.status,
+      },
+    };
+  }
+
+  /**
+   * Fallback to direct OCR.space API if MCP bridge fails
+   */
+  private async fallbackOCRSpace(imageData: string | Buffer): Promise<OCRResult> {
+    try {
+      // Convert to base64 if needed
+      let base64Image: string;
+
+      if (typeof imageData === 'string') {
+        if (imageData.startsWith('data:image')) {
+          base64Image = imageData;
+        } else {
+          base64Image = `data:image/jpeg;base64,${imageData}`;
+        }
+      } else {
+        base64Image = `data:image/jpeg;base64,${imageData.toString('base64')}`;
+      }
+
+      // Call OCR.space API directly
+      const formData = new FormData();
+      formData.append('apikey', OCRSPACE_API_KEY);
+      formData.append('base64Image', base64Image);
+      formData.append('language', 'eng');
+      formData.append('OCREngine', '2');
+
+      const response = await fetch('https://api.ocr.space/parse/image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`OCR.space API failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (result.IsErroredOnProcessing || !result.ParsedResults?.[0]) {
+        throw new Error(result.ErrorMessage || 'OCR processing failed');
+      }
+
+      const parsedText = result.ParsedResults[0].ParsedText || '';
+
+      // Simple extraction
+      const amount = this.extractAmount({ text: parsedText });
+      const merchant = parsedText.split('\n')[0] || null;
+
+      return {
+        merchantName: merchant,
+        amount: amount.total,
+        currency: this.detectCurrency({ text: parsedText }) || 'USD',
+        date: null,
+        category: this.inferCategory(merchant),
+        taxAmount: amount.tax,
+        paymentMethod: null,
+        confidence: 0.7,
+        rawText: parsedText,
+        metadata: {
+          ocrProvider: 'ocr.space-direct',
+          ocrConfidence: 0.9,
+          processingTime: 0,
+        },
+      };
+    } catch (error) {
+      console.error('Fallback OCR.space error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Infer category from merchant name
+   */
+  private inferCategory(merchantName: string | null): string | null {
+    if (!merchantName) return null;
+
+    const merchant = merchantName.toLowerCase();
+
+    const categoryRules = [
+      { keywords: ['restaurant', 'cafe', 'coffee', 'food', 'dining', 'lunch', 'dinner', 'starbucks', 'mcdonald'], category: 'Meals' },
+      { keywords: ['hotel', 'motel', 'inn', 'accommodation', 'lodging', 'airbnb', 'hilton', 'marriott'], category: 'Accommodation' },
+      { keywords: ['airline', 'flight', 'airport', 'boarding', 'airways', 'cebu pacific'], category: 'Travel' },
+      { keywords: ['taxi', 'uber', 'lyft', 'grab', 'transport', 'bus', 'train', 'subway'], category: 'Transportation' },
+      { keywords: ['office', 'staples', 'supplies', 'depot', 'stationery'], category: 'Office Supplies' },
+      { keywords: ['training', 'course', 'conference', 'seminar', 'workshop'], category: 'Training' },
+      { keywords: ['mobile', 'phone', 'internet', 'telecom', 'communication'], category: 'Communication' },
+    ];
+
+    for (const rule of categoryRules) {
+      if (rule.keywords.some(keyword => merchant.includes(keyword))) {
+        return rule.category;
+      }
+    }
+
+    return 'Other';
   }
 
   /**

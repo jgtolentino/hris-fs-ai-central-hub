@@ -18,6 +18,7 @@ import { Camera, Receipt, X, Check, AlertCircle, Upload } from 'lucide-react-nat
 import { useExpenseStore } from '../../store/expense-store';
 import { OCRService } from '../../services/ocr-service';
 import { supabase } from '../../lib/supabase';
+import { ConcurDesignTokens, formatCurrency } from '../../constants/concurDesignTokens';
 
 interface ExpenseFormData {
   merchantName: string;
@@ -287,15 +288,15 @@ export const ExpenseSubmissionFlow: React.FC = () => {
             style={styles.captureButton}
             onPress={() => captureReceipt('camera')}
           >
-            <Camera size={48} color="#FFD700" />
+            <Camera size={48} color={ConcurDesignTokens.colors.primary} />
             <Text style={styles.captureButtonText}>Take Photo</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={styles.captureButton}
             onPress={() => captureReceipt('gallery')}
           >
-            <Upload size={48} color="#FFD700" />
+            <Upload size={48} color={ConcurDesignTokens.colors.primary} />
             <Text style={styles.captureButtonText}>Upload Image</Text>
           </TouchableOpacity>
         </View>
@@ -482,7 +483,7 @@ export const ExpenseSubmissionFlow: React.FC = () => {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="black" />
+            <ActivityIndicator color={ConcurDesignTokens.colors.textOnPrimary} />
           ) : (
             <Text style={styles.primaryButtonText}>Submit Expense</Text>
           )}
@@ -495,7 +496,7 @@ export const ExpenseSubmissionFlow: React.FC = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FFD700" />
+          <ActivityIndicator size="large" color={ConcurDesignTokens.colors.primary} />
           <Text style={styles.loadingText}>Processing receipt...</Text>
         </View>
       </SafeAreaView>
@@ -527,104 +528,105 @@ export const ExpenseSubmissionFlow: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: ConcurDesignTokens.colors.background,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: 'white',
+    padding: ConcurDesignTokens.spacing.base,
+    backgroundColor: ConcurDesignTokens.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: ConcurDesignTokens.colors.border,
+    ...ConcurDesignTokens.shadows.sm,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: ConcurDesignTokens.typography.fontSize.xl,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.bold,
+    color: ConcurDesignTokens.colors.text,
   },
   progressBar: {
     flexDirection: 'row',
-    padding: 16,
-    gap: 8,
+    padding: ConcurDesignTokens.spacing.base,
+    gap: ConcurDesignTokens.spacing.sm,
   },
   progressStep: {
     flex: 1,
     height: 4,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 2,
+    backgroundColor: ConcurDesignTokens.colors.border,
+    borderRadius: ConcurDesignTokens.borderRadius.sm,
   },
   progressStepCompleted: {
-    backgroundColor: '#FFD700',
+    backgroundColor: ConcurDesignTokens.colors.primary,
   },
   stepContainer: {
     flex: 1,
-    padding: 16,
+    padding: ConcurDesignTokens.spacing.base,
   },
   stepTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    fontSize: ConcurDesignTokens.typography.fontSize.xxl,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.bold,
+    color: ConcurDesignTokens.colors.text,
+    marginBottom: ConcurDesignTokens.spacing.sm,
   },
   stepDescription: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 24,
+    fontSize: ConcurDesignTokens.typography.fontSize.base,
+    color: ConcurDesignTokens.colors.textSecondary,
+    marginBottom: ConcurDesignTokens.spacing.xl,
   },
   captureOptions: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginVertical: 32,
+    marginVertical: ConcurDesignTokens.spacing.xxl,
   },
   captureButton: {
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    elevation: 2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    padding: ConcurDesignTokens.spacing.lg,
+    backgroundColor: ConcurDesignTokens.colors.surface,
+    borderRadius: ConcurDesignTokens.borderRadius.lg,
+    ...ConcurDesignTokens.shadows.md,
   },
   captureButtonText: {
-    marginTop: 8,
-    fontSize: 16,
-    fontWeight: '600',
+    marginTop: ConcurDesignTokens.spacing.sm,
+    fontSize: ConcurDesignTokens.typography.fontSize.base,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.semibold,
+    color: ConcurDesignTokens.colors.text,
   },
   imageContainer: {
     position: 'relative',
-    marginVertical: 20,
+    marginVertical: ConcurDesignTokens.spacing.lg,
     alignItems: 'center',
   },
   receiptImage: {
     width: 300,
     height: 400,
-    borderRadius: 8,
+    borderRadius: ConcurDesignTokens.borderRadius.lg,
   },
   removeImageButton: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: ConcurDesignTokens.spacing.md,
+    right: ConcurDesignTokens.spacing.md,
     backgroundColor: 'rgba(0,0,0,0.7)',
-    borderRadius: 20,
-    padding: 8,
+    borderRadius: ConcurDesignTokens.borderRadius.full,
+    padding: ConcurDesignTokens.spacing.sm,
   },
   manualEntryContainer: {
     alignItems: 'center',
-    marginTop: 32,
+    marginTop: ConcurDesignTokens.spacing.xxl,
   },
   orText: {
-    fontSize: 14,
-    color: '#999',
-    marginBottom: 12,
+    fontSize: ConcurDesignTokens.typography.fontSize.sm,
+    color: ConcurDesignTokens.colors.textTertiary,
+    marginBottom: ConcurDesignTokens.spacing.md,
   },
   manualEntryButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingVertical: ConcurDesignTokens.spacing.md,
+    paddingHorizontal: ConcurDesignTokens.spacing.xl,
   },
   manualEntryText: {
-    fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '600',
+    fontSize: ConcurDesignTokens.typography.fontSize.base,
+    color: ConcurDesignTokens.colors.primary,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.semibold,
   },
   loadingContainer: {
     flex: 1,
@@ -632,36 +634,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#666',
+    marginTop: ConcurDesignTokens.spacing.base,
+    fontSize: ConcurDesignTokens.typography.fontSize.base,
+    color: ConcurDesignTokens.colors.textSecondary,
   },
   ocrConfidence: {
-    backgroundColor: '#E8F5E9',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
+    backgroundColor: ConcurDesignTokens.colors.successLight,
+    padding: ConcurDesignTokens.spacing.md,
+    borderRadius: ConcurDesignTokens.borderRadius.lg,
+    marginBottom: ConcurDesignTokens.spacing.base,
   },
   confidenceText: {
-    color: '#2E7D32',
-    fontSize: 14,
-    fontWeight: '500',
+    color: ConcurDesignTokens.colors.success,
+    fontSize: ConcurDesignTokens.typography.fontSize.sm,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.medium,
   },
   formSection: {
-    marginBottom: 20,
+    marginBottom: ConcurDesignTokens.spacing.lg,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
+    fontSize: ConcurDesignTokens.typography.fontSize.base,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.semibold,
+    color: ConcurDesignTokens.colors.text,
+    marginBottom: ConcurDesignTokens.spacing.sm,
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: ConcurDesignTokens.colors.surface,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
+    borderColor: ConcurDesignTokens.colors.border,
+    borderRadius: ConcurDesignTokens.borderRadius.lg,
+    padding: ConcurDesignTokens.spacing.md,
+    fontSize: ConcurDesignTokens.typography.fontSize.base,
+    color: ConcurDesignTokens.colors.text,
   },
   textArea: {
     minHeight: 80,
@@ -669,139 +673,139 @@ const styles = StyleSheet.create({
   },
   amountContainer: {
     flexDirection: 'row',
-    gap: 8,
+    gap: ConcurDesignTokens.spacing.sm,
   },
   amountInput: {
     flex: 1,
   },
   currencySelector: {
-    backgroundColor: 'white',
+    backgroundColor: ConcurDesignTokens.colors.surface,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    paddingHorizontal: 16,
+    borderColor: ConcurDesignTokens.colors.border,
+    borderRadius: ConcurDesignTokens.borderRadius.lg,
+    paddingHorizontal: ConcurDesignTokens.spacing.base,
     justifyContent: 'center',
   },
   currencyText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: ConcurDesignTokens.typography.fontSize.base,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.semibold,
+    color: ConcurDesignTokens.colors.text,
   },
   categoryChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: 'white',
+    paddingHorizontal: ConcurDesignTokens.spacing.base,
+    paddingVertical: ConcurDesignTokens.spacing.sm,
+    backgroundColor: ConcurDesignTokens.colors.surface,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 20,
-    marginRight: 8,
+    borderColor: ConcurDesignTokens.colors.border,
+    borderRadius: ConcurDesignTokens.borderRadius.full,
+    marginRight: ConcurDesignTokens.spacing.sm,
   },
   categoryChipSelected: {
-    backgroundColor: '#FFD700',
-    borderColor: '#FFD700',
+    backgroundColor: ConcurDesignTokens.colors.primary,
+    borderColor: ConcurDesignTokens.colors.primary,
   },
   categoryChipText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: ConcurDesignTokens.typography.fontSize.sm,
+    color: ConcurDesignTokens.colors.textSecondary,
   },
   categoryChipTextSelected: {
-    color: 'black',
-    fontWeight: '600',
+    color: ConcurDesignTokens.colors.textOnPrimary,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.semibold,
   },
   receiptPreview: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0F0F0',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 16,
+    backgroundColor: ConcurDesignTokens.colors.infoLight,
+    padding: ConcurDesignTokens.spacing.md,
+    borderRadius: ConcurDesignTokens.borderRadius.lg,
+    marginVertical: ConcurDesignTokens.spacing.base,
   },
   receiptPreviewText: {
-    marginLeft: 8,
-    color: '#666',
+    marginLeft: ConcurDesignTokens.spacing.sm,
+    color: ConcurDesignTokens.colors.textSecondary,
   },
   buttonContainer: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 24,
+    gap: ConcurDesignTokens.spacing.md,
+    marginTop: ConcurDesignTokens.spacing.xl,
   },
   button: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 8,
+    paddingVertical: ConcurDesignTokens.spacing.base,
+    borderRadius: ConcurDesignTokens.borderRadius.lg,
     alignItems: 'center',
+    ...ConcurDesignTokens.shadows.sm,
   },
   primaryButton: {
-    backgroundColor: '#FFD700',
+    backgroundColor: ConcurDesignTokens.colors.primary,
   },
   primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'black',
+    fontSize: ConcurDesignTokens.typography.fontSize.base,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.semibold,
+    color: ConcurDesignTokens.colors.textOnPrimary,
   },
   secondaryButton: {
-    backgroundColor: 'white',
+    backgroundColor: ConcurDesignTokens.colors.surface,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: ConcurDesignTokens.colors.border,
   },
   secondaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
+    fontSize: ConcurDesignTokens.typography.fontSize.base,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.semibold,
+    color: ConcurDesignTokens.colors.textSecondary,
   },
   summaryCard: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 20,
-    elevation: 2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    backgroundColor: ConcurDesignTokens.colors.surface,
+    padding: ConcurDesignTokens.spacing.lg,
+    borderRadius: ConcurDesignTokens.borderRadius.xl,
+    marginBottom: ConcurDesignTokens.spacing.lg,
+    ...ConcurDesignTokens.shadows.md,
   },
   summaryTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    fontSize: ConcurDesignTokens.typography.fontSize.xl,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.bold,
+    color: ConcurDesignTokens.colors.text,
+    marginBottom: ConcurDesignTokens.spacing.sm,
   },
   summaryAmount: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFD700',
-    marginBottom: 4,
+    fontSize: ConcurDesignTokens.typography.fontSize.xxxl,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.bold,
+    color: ConcurDesignTokens.colors.primary,
+    marginBottom: ConcurDesignTokens.spacing.xs,
   },
   summaryCategory: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 8,
+    fontSize: ConcurDesignTokens.typography.fontSize.base,
+    color: ConcurDesignTokens.colors.textSecondary,
+    marginBottom: ConcurDesignTokens.spacing.sm,
   },
   summaryDescription: {
-    fontSize: 14,
-    color: '#999',
-    marginTop: 8,
+    fontSize: ConcurDesignTokens.typography.fontSize.sm,
+    color: ConcurDesignTokens.colors.textTertiary,
+    marginTop: ConcurDesignTokens.spacing.sm,
   },
   violationsContainer: {
-    backgroundColor: '#FFF3CD',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: ConcurDesignTokens.colors.warningLight,
+    padding: ConcurDesignTokens.spacing.base,
+    borderRadius: ConcurDesignTokens.borderRadius.lg,
     borderWidth: 1,
-    borderColor: '#FFE69C',
-    marginBottom: 20,
+    borderColor: ConcurDesignTokens.colors.warning,
+    marginBottom: ConcurDesignTokens.spacing.lg,
   },
   violationHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: ConcurDesignTokens.spacing.sm,
   },
   violationTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-    color: '#856404',
+    fontSize: ConcurDesignTokens.typography.fontSize.base,
+    fontWeight: ConcurDesignTokens.typography.fontWeight.semibold,
+    marginLeft: ConcurDesignTokens.spacing.sm,
+    color: ConcurDesignTokens.colors.warning,
   },
   violationText: {
-    fontSize: 14,
-    color: '#856404',
-    marginLeft: 28,
-    marginBottom: 4,
+    fontSize: ConcurDesignTokens.typography.fontSize.sm,
+    color: ConcurDesignTokens.colors.warning,
+    marginLeft: ConcurDesignTokens.spacing.xxl,
+    marginBottom: ConcurDesignTokens.spacing.xs,
   },
 });
