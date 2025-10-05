@@ -1,14 +1,12 @@
 // OCR Service for Receipt Processing
-// Integrates with render-mcp-bridge FREE OCR service (OCR.space)
+// Integrates with Render OCR Unified Service
 
 import { createClient } from '@supabase/supabase-js';
 
-// Render MCP Bridge - FREE OCR endpoint (deployed on Vercel)
-const MCP_BRIDGE_URL = process.env.EXPO_PUBLIC_MCP_BRIDGE_URL ||
-  'https://render-mcp-bridge-919ww1du3-jake-tolentinos-projects-c0369c83.vercel.app';
-
-// Fallback: Direct OCR.space API (25,000 free requests/month)
-const OCRSPACE_API_KEY = process.env.EXPO_PUBLIC_OCRSPACE_API_KEY || 'K87899142388957';
+// Render OCR Unified - Production endpoint
+const OCR_API_URL = process.env.EXPO_PUBLIC_OCR_API_URL || 'https://ocr-unified.onrender.com/ocr';
+const OCR_AUTH_USER = process.env.EXPO_PUBLIC_OCR_AUTH_USER || '';
+const OCR_AUTH_PASS = process.env.EXPO_PUBLIC_OCR_AUTH_PASS || '';
 
 export interface OCRResult {
   merchantName: string | null;
@@ -48,7 +46,7 @@ export class OCRService {
   }
 
   /**
-   * Process receipt image with OCR using render-mcp-bridge (FREE)
+   * Process receipt image with OCR using Render OCR Unified Service
    */
   async processReceipt(
     imageData: string | Buffer,
@@ -59,40 +57,64 @@ export class OCRService {
     } = {}
   ): Promise<OCRResult> {
     try {
-      // Upload image to Supabase storage first
-      const storagePath = await this.uploadToSupabase(imageData);
-
       // Get current user ID
       const { data: { user } } = await this.supabase.auth.getUser();
-      const userId = user?.id || 'anonymous';
+      const userId = user?.id;
 
-      // Call render-mcp-bridge FREE OCR endpoint
-      const ocrResponse = await fetch(`${MCP_BRIDGE_URL}/api/receipts/instant-ocr-free`, {
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Upload image to Supabase storage first
+      const storagePath = await this.uploadToSupabase(imageData, userId);
+
+      // Get public URL for OCR service
+      const { data: urlData } = this.supabase.storage
+        .from('receipts')
+        .getPublicUrl(storagePath);
+
+      // Call Render OCR Unified endpoint with Basic Auth
+      const authHeader = 'Basic ' + btoa(`${OCR_AUTH_USER}:${OCR_AUTH_PASS}`);
+
+      const ocrResponse = await fetch(OCR_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': authHeader,
         },
         body: JSON.stringify({
-          storage_path: storagePath,
-          schema_name: 'receipt_v1',
+          image_url: urlData.publicUrl,
           user_id: userId,
         }),
       });
 
       if (!ocrResponse.ok) {
-        // Fallback to direct OCR.space if MCP bridge fails
-        console.warn('MCP bridge OCR failed, falling back to OCR.space');
-        return await this.fallbackOCRSpace(imageData);
+        throw new Error(`OCR service failed: ${ocrResponse.statusText}`);
       }
 
       const ocrData = await ocrResponse.json();
 
-      if (!ocrData.ok) {
-        throw new Error(ocrData.error || 'OCR processing failed');
+      // Save OCR results to te.receipt_ocr table
+      const { error: dbError } = await this.supabase
+        .from('te.receipt_ocr')
+        .insert({
+          user_id: userId,
+          storage_path: storagePath,
+          ocr_text: ocrData.text || '',
+          merchant: ocrData.merchant_name,
+          total: ocrData.total_amount,
+          currency: ocrData.currency || 'USD',
+          date: ocrData.date,
+          confidence: ocrData.confidence || 0.9,
+          raw_response: ocrData,
+        });
+
+      if (dbError) {
+        console.warn('Failed to save OCR results to database:', dbError);
       }
 
-      // Convert MCP bridge response to our OCRResult format
-      const result = this.convertMCPBridgeResult(ocrData.data);
+      // Convert to OCRResult format
+      const result = this.convertOCRResponse(ocrData, storagePath);
 
       return result;
     } catch (error) {
@@ -108,7 +130,7 @@ export class OCRService {
   /**
    * Upload image to Supabase storage
    */
-  private async uploadToSupabase(imageData: string | Buffer): Promise<string> {
+  private async uploadToSupabase(imageData: string | Buffer, userId: string): Promise<string> {
     try {
       // Convert to buffer if needed
       let buffer: Buffer;
@@ -132,9 +154,9 @@ export class OCRService {
         buffer = imageData;
       }
 
-      // Generate unique filename
+      // Generate unique filename with user folder
       const timestamp = Date.now();
-      const filename = `receipt-${timestamp}.jpg`;
+      const filename = `${userId}/receipt-${timestamp}.jpg`;
 
       // Upload to Supabase storage (receipts bucket)
       const { data, error } = await this.supabase.storage
@@ -148,8 +170,8 @@ export class OCRService {
         throw error;
       }
 
-      // Return storage path for MCP bridge
-      return `receipts/${filename}`;
+      // Return storage path
+      return filename;
     } catch (error) {
       console.error('Supabase upload error:', error);
       throw error;
@@ -157,94 +179,25 @@ export class OCRService {
   }
 
   /**
-   * Convert MCP bridge response to our OCRResult format
+   * Convert Render OCR response to our OCRResult format
    */
-  private convertMCPBridgeResult(data: any): OCRResult {
+  private convertOCRResponse(data: any, storagePath: string): OCRResult {
     return {
-      merchantName: data.merchant || null,
-      amount: data.total || null,
+      merchantName: data.merchant_name || null,
+      amount: data.total_amount || null,
       currency: data.currency || 'USD',
       date: data.date ? new Date(data.date) : null,
-      category: this.inferCategory(data.merchant),
-      taxAmount: data.tax || null,
+      category: this.inferCategory(data.merchant_name),
+      taxAmount: data.tax_amount || null,
       paymentMethod: null,
-      confidence: (data.confidence || 0) / 100,
-      rawText: data.ocr_text || '',
+      confidence: data.confidence || 0.9,
+      rawText: data.text || '',
       metadata: {
-        ocrProvider: 'ocr.space',
-        ocrConfidence: data.ocr_confidence || 0.9,
-        processingTime: 0,
-        status: data.status,
+        ocrProvider: 'render-ocr-unified',
+        storagePath: storagePath,
+        processingTime: data.processing_time_ms || 0,
       },
     };
-  }
-
-  /**
-   * Fallback to direct OCR.space API if MCP bridge fails
-   */
-  private async fallbackOCRSpace(imageData: string | Buffer): Promise<OCRResult> {
-    try {
-      // Convert to base64 if needed
-      let base64Image: string;
-
-      if (typeof imageData === 'string') {
-        if (imageData.startsWith('data:image')) {
-          base64Image = imageData;
-        } else {
-          base64Image = `data:image/jpeg;base64,${imageData}`;
-        }
-      } else {
-        base64Image = `data:image/jpeg;base64,${imageData.toString('base64')}`;
-      }
-
-      // Call OCR.space API directly
-      const formData = new FormData();
-      formData.append('apikey', OCRSPACE_API_KEY);
-      formData.append('base64Image', base64Image);
-      formData.append('language', 'eng');
-      formData.append('OCREngine', '2');
-
-      const response = await fetch('https://api.ocr.space/parse/image', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`OCR.space API failed: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-
-      if (result.IsErroredOnProcessing || !result.ParsedResults?.[0]) {
-        throw new Error(result.ErrorMessage || 'OCR processing failed');
-      }
-
-      const parsedText = result.ParsedResults[0].ParsedText || '';
-
-      // Simple extraction
-      const amount = this.extractAmount({ text: parsedText });
-      const merchant = parsedText.split('\n')[0] || null;
-
-      return {
-        merchantName: merchant,
-        amount: amount.total,
-        currency: this.detectCurrency({ text: parsedText }) || 'USD',
-        date: null,
-        category: this.inferCategory(merchant),
-        taxAmount: amount.tax,
-        paymentMethod: null,
-        confidence: 0.7,
-        rawText: parsedText,
-        metadata: {
-          ocrProvider: 'ocr.space-direct',
-          ocrConfidence: 0.9,
-          processingTime: 0,
-        },
-      };
-    } catch (error) {
-      console.error('Fallback OCR.space error:', error);
-      throw error;
-    }
   }
 
   /**
